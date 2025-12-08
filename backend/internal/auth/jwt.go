@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 	"os"
+	"sync"
 	"time"
 
 	"backend/internal/models"
@@ -11,7 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
-var jwtSecret []byte
+var (
+	jwtSecret []byte
+	once      sync.Once
+)
 
 // InitJWT initializes JWT secret from environment or config
 func InitJWT() {
@@ -33,9 +37,7 @@ type Claims struct {
 
 // GenerateToken generates a JWT token for a user
 func GenerateToken(user *models.User) (string, error) {
-	if jwtSecret == nil {
-		InitJWT()
-	}
+	once.Do(InitJWT)
 
 	// Set expiration time (24 hours)
 	expirationTime := time.Now().Add(24 * time.Hour)
@@ -65,9 +67,7 @@ func GenerateToken(user *models.User) (string, error) {
 
 // ValidateToken validates a JWT token and returns the claims
 func ValidateToken(tokenString string) (*Claims, error) {
-	if jwtSecret == nil {
-		InitJWT()
-	}
+	once.Do(InitJWT)
 
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		// Validate signing method
