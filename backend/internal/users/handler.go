@@ -4,6 +4,8 @@ import (
 	"os"
 	"strconv"
 
+	"backend/internal/auth"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
@@ -112,9 +114,9 @@ func (h *Handler) List(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"users": users,
-		"total": total,
-		"limit": limit,
+		"users":  users,
+		"total":  total,
+		"limit":  limit,
 		"offset": offset,
 	})
 }
@@ -184,9 +186,49 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 		})
 	}
 
+	// Generate JWT token
+	token, err := auth.GenerateToken(user)
+	if err != nil {
+		h.logger.Error().
+			Err(err).
+			Str("user_id", user.ID.String()).
+			Msg("Failed to generate JWT token")
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to generate token",
+		})
+	}
+
 	return c.JSON(fiber.Map{
-		"user": user,
-		"message": "Authentication successful",
+		"user":       user,
+		"token":      token,
+		"token_type": "Bearer",
+		"expires_in": 86400, // 24 hours in seconds
+		"message":    "Authentication successful",
 	})
 }
 
+// RefreshToken handles POST /users/refresh
+func (h *Handler) RefreshToken(c *fiber.Ctx) error {
+	var req struct {
+		Token string `json:"token"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	newToken, err := auth.RefreshToken(req.Token)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Invalid or expired token",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"token":      newToken,
+		"token_type": "Bearer",
+		"expires_in": 86400, // 24 hours in seconds
+		"message":    "Token refreshed successfully",
+	})
+}

@@ -1,21 +1,34 @@
 import type { Metadata } from 'next'
-import { ReactNode } from 'react'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+  preload: true,
+})
+
 export const metadata: Metadata = {
-  title: 'MailBlast Analytics Dashboard',
-  description: 'Email analytics and performance dashboard',
+  title: 'MailBlast - Email Marketing Platform',
+  description: 'Professional email marketing and analytics platform',
 }
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode
+  children: React.ReactNode
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <head>
+        {/* Preconnect to external resources */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className={`${inter.variable} font-sans antialiased`}>
+        {children}
+      </body>
     </html>
   )
 }
-

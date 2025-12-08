@@ -122,6 +122,9 @@ SNS_VERIFY=false
 
 # Campaign Storage (optional)
 CAMPAIGN_STORAGE_PATH=storage/campaigns
+
+# JWT Authentication
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
 ```
 
 ### Running

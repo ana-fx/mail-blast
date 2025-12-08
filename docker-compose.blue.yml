@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  backend:
+    image: registry.example.com/mailblast-backend:${VERSION:-latest}
+    container_name: blue-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - AWS_SNS_TOPIC_ARN=${AWS_SNS_TOPIC_ARN}
+      - ENVIRONMENT=blue
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - mailblast-network
+
+  frontend:
+    image: registry.example.com/mailblast-frontend:${VERSION:-latest}
+    container_name: blue-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - mailblast-network
+
+  worker:
+    image: registry.example.com/mailblast-worker:${VERSION:-latest}
+    container_name: blue-worker
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - AWS_SNS_TOPIC_ARN=${AWS_SNS_TOPIC_ARN}
+      - ENVIRONMENT=blue
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - mailblast-network
+    deploy:
+      replicas: 2
+
+networks:
+  mailblast-network:
+    external: true
+

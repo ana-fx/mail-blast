@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import * as analyticsAPI from '@/lib/api/analytics'
-import type { OverviewStats, TimelineStat, TopLink, EmailEventsResponse } from '@/lib/api/analytics'
+import { analyticsApi } from '@/lib/api/analytics'
+import type { AnalyticsOverview, TimelineData } from '@/lib/api/analytics'
 
 export function useOverview() {
-  const [data, setData] = useState<OverviewStats | null>(null)
+  const [data, setData] = useState<AnalyticsOverview | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -11,7 +11,7 @@ export function useOverview() {
     async function fetchData() {
       try {
         setLoading(true)
-        const result = await analyticsAPI.getOverview()
+        const result = await analyticsApi.getOverview()
         setData(result)
         setError(null)
       } catch (err) {
@@ -26,8 +26,8 @@ export function useOverview() {
   return { data, loading, error }
 }
 
-export function useTimeline(range: string = '7d') {
-  const [data, setData] = useState<TimelineStat[]>([])
+export function useTimeline(range: '7d' | '30d' | '90d' = '30d') {
+  const [data, setData] = useState<TimelineData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -35,7 +35,7 @@ export function useTimeline(range: string = '7d') {
     async function fetchData() {
       try {
         setLoading(true)
-        const result = await analyticsAPI.getTimeline(range)
+        const result = await analyticsApi.getTimeline(range)
         setData(result)
         setError(null)
       } catch (err) {
@@ -50,56 +50,4 @@ export function useTimeline(range: string = '7d') {
   return { data, loading, error }
 }
 
-export function useTopLinks(limit: number = 10) {
-  const [data, setData] = useState<TopLink[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const result = await analyticsAPI.getTopLinks(limit)
-        setData(result)
-        setError(null)
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [limit])
-
-  return { data, loading, error }
-}
-
-export function useEmailEvents(messageId: string | null) {
-  const [data, setData] = useState<EmailEventsResponse | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    if (!messageId) {
-      setData(null)
-      return
-    }
-
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const result = await analyticsAPI.getEmailEvents(messageId)
-        setData(result)
-        setError(null)
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [messageId])
-
-  return { data, loading, error }
-}
 

@@ -1,23 +1,27 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+'use client'
 
-export interface OverviewStats {
+import api from '@/lib/axios'
+
+export interface AnalyticsOverview {
   total_sent: number
   total_delivered: number
   total_bounced: number
-  total_complaint: number
+  total_opened: number
+  total_clicked: number
   total_failed: number
+  delivery_rate: number
   open_rate: number
   click_rate: number
+  bounce_rate: number
 }
 
-export interface TimelineStat {
+export interface TimelineData {
   date: string
   sent: number
   delivered: number
-  opens: number
-  clicks: number
+  opened: number
+  clicked: number
   bounces: number
-  complaints: number
 }
 
 export interface TopLink {
@@ -28,85 +32,47 @@ export interface TopLink {
 
 export interface EmailEvent {
   id: string
-  event_type: string
-  meta: Record<string, any>
-  created_at: string
-}
-
-export interface EmailEventsResponse {
   message_id: string
+  event_type: 'sent' | 'delivered' | 'opened' | 'clicked' | 'bounce' | 'complaint'
+  email_id?: string
+  campaign_name?: string
+  recipient_email?: string
+  created_at: string
+  meta?: Record<string, any>
+}
+
+export interface EventDetails {
+  message_id: string
+  subject?: string
+  to?: string
+  from?: string
+  status?: string
   events: EmailEvent[]
-}
-
-export async function getOverview(): Promise<OverviewStats> {
-  try {
-    const response = await fetch(`${API_URL}/analytics/overview`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    return response.json()
-  } catch (error) {
-    console.error('Error fetching overview:', error)
-    throw new Error(`Failed to fetch overview stats: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  campaign?: {
+    id: string
+    title: string
   }
 }
 
-export async function getTimeline(range: string = '7d'): Promise<TimelineStat[]> {
-  try {
-    const response = await fetch(`${API_URL}/analytics/timeline?range=${range}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    return response.json()
-  } catch (error) {
-    console.error('Error fetching timeline:', error)
-    throw new Error(`Failed to fetch timeline stats: ${error instanceof Error ? error.message : 'Unknown error'}`)
-  }
+export const analyticsApi = {
+  getOverview: async (): Promise<AnalyticsOverview> => {
+    const response = await api.get<AnalyticsOverview>('/analytics/overview')
+    return response.data
+  },
+  getTimeline: async (range: '7d' | '30d' | '90d' = '30d'): Promise<TimelineData[]> => {
+    const response = await api.get<TimelineData[]>(`/analytics/timeline?range=${range}`)
+    return response.data
+  },
+  getTopLinks: async (limit: number = 10): Promise<TopLink[]> => {
+    const response = await api.get<TopLink[]>(`/analytics/top-links?limit=${limit}`)
+    return response.data
+  },
+  getRecentEvents: async (limit: number = 25): Promise<EmailEvent[]> => {
+    const response = await api.get<EmailEvent[]>(`/analytics/events/recent?limit=${limit}`)
+    return response.data
+  },
+  getEventsByMessageId: async (messageId: string): Promise<EventDetails> => {
+    const response = await api.get<EventDetails>(`/analytics/events/${messageId}`)
+    return response.data
+  },
 }
-
-export async function getTopLinks(limit: number = 10): Promise<TopLink[]> {
-  try {
-    const response = await fetch(`${API_URL}/analytics/top-links?limit=${limit}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    return response.json()
-  } catch (error) {
-    console.error('Error fetching top links:', error)
-    throw new Error(`Failed to fetch top links: ${error instanceof Error ? error.message : 'Unknown error'}`)
-  }
-}
-
-export async function getEmailEvents(messageId: string): Promise<EmailEventsResponse> {
-  try {
-    const response = await fetch(`${API_URL}/analytics/events/${encodeURIComponent(messageId)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    return response.json()
-  } catch (error) {
-    console.error('Error fetching email events:', error)
-    throw new Error(`Failed to fetch email events: ${error instanceof Error ? error.message : 'Unknown error'}`)
-  }
-}
-

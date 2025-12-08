@@ -27,6 +27,8 @@ type Config struct {
 	SMTPPort     int
 	SMTPUsername string
 	SMTPPassword string
+	// JWT Configuration
+	JWTSecret string
 }
 
 var AppConfig *Config
@@ -62,6 +64,8 @@ func Load() (*Config, error) {
 		SMTPPort:     smtpPort,
 		SMTPUsername: getEnv("SMTP_USERNAME", ""),
 		SMTPPassword: getEnv("SMTP_PASSWORD", ""),
+		// JWT
+		JWTSecret: getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
 	}
 
 	AppConfig = config

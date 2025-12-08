@@ -4,10 +4,10 @@ import (
 	"os"
 	"strings"
 
+	"backend/internal/auth"
 	"backend/internal/users"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
 
@@ -24,33 +24,30 @@ func AuthMiddleware(userService users.Service) fiber.Handler {
 			})
 		}
 
-		// Extract token (Bearer <token> or just <token>)
+		// Extract token (Bearer <token>)
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		token = strings.TrimSpace(token)
 
 		if token == "" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Invalid authorization token",
+				"error": "Authorization token required",
 			})
 		}
 
-		// TODO: Validate JWT token or API key
-		// For now, we'll extract user ID from token (if it's a UUID)
-		// In production, you should use JWT validation
-		userID, err := uuid.Parse(token)
+		// Validate JWT token
+		claims, err := auth.ValidateToken(token)
 		if err != nil {
-			// If token is not UUID, treat it as API key
-			// TODO: Implement API key validation
 			logger.Warn().
-				Str("token", token).
-				Msg("Token validation not implemented")
+				Err(err).
+				Str("token", token[:min(20, len(token))]+"...").
+				Msg("Invalid JWT token")
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Invalid token format",
+				"error": "Invalid or expired token",
 			})
 		}
 
-		// Get user from database
-		user, err := userService.GetUser(c.Context(), userID)
+		// Get user from database to verify it still exists and is active
+		user, err := userService.GetUser(c.Context(), claims.UserID)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "User not found",
@@ -64,13 +61,34 @@ func AuthMiddleware(userService users.Service) fiber.Handler {
 			})
 		}
 
-		// Store user in context
+		// Verify role hasn't changed (optional security check)
+		if user.Role != claims.Role {
+			logger.Warn().
+				Str("user_id", user.ID.String()).
+				Str("token_role", claims.Role).
+				Str("user_role", user.Role).
+				Msg("User role changed, token invalidated")
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Token invalidated due to role change",
+			})
+		}
+
+		// Store user and claims in context
 		c.Locals("user", user)
 		c.Locals("user_id", user.ID)
 		c.Locals("user_role", user.Role)
+		c.Locals("claims", claims)
 
 		return c.Next()
 	}
+}
+
+// min returns the minimum of two integers
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // RequireRole middleware checks if user has required role
@@ -105,4 +123,3 @@ func RequireAdmin() fiber.Handler {
 func RequireClientOrAdmin() fiber.Handler {
 	return RequireRole("admin", "client")
 }
-
