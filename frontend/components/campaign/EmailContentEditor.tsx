@@ -20,7 +20,7 @@ interface EmailContentEditorProps {
 }
 
 export default function EmailContentEditor({ campaignId, onNext, onBack }: EmailContentEditorProps) {
-  const { step2Data, setStep2Data } = useCampaignStore()
+  const { step1Data, step2Data, setStep2Data } = useCampaignStore()
   const [showTestModal, setShowTestModal] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
@@ -156,7 +156,10 @@ export default function EmailContentEditor({ campaignId, onNext, onBack }: Email
 
       {showPreview && (
         <EmailPreviewModal
-          content={step2Data.content}
+          htmlContent={step2Data.content || ''}
+          subject={step1Data.subject}
+          fromName={step1Data.from_name}
+          fromEmail={step1Data.from_email}
           open={showPreview}
           onClose={() => setShowPreview(false)}
         />

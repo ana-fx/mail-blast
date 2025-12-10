@@ -26,10 +26,19 @@ class HttpClient {
   }
 
   private async getToken(): Promise<string | null> {
-    // Get token from auth store or cookie
+    // Get token from auth store or localStorage
     if (typeof window !== 'undefined') {
       const { useAuthStore } = await import('@/store/authStore')
-      return useAuthStore.getState().token || null
+      const token = useAuthStore.getState().token
+      // Fallback to localStorage if token not in store
+      if (!token) {
+        const storedToken = localStorage.getItem('auth_token')
+        if (storedToken) {
+          useAuthStore.getState().setToken(storedToken)
+          return storedToken
+        }
+      }
+      return token || null
     }
     return null
   }
@@ -176,10 +185,51 @@ class HttpClient {
 
     const retries = config.retries ?? (config.method === 'GET' ? DEFAULT_RETRIES : 0)
 
-    const response = await this.fetchWithRetry(url, {
+    let response = await this.fetchWithRetry(url, {
       ...config,
       headers,
     }, retries)
+
+    // Handle 401 - try to refresh token first (before consuming response)
+    if (response.status === 401 && !config.skipAuth && !endpoint.includes('/users/refresh') && !endpoint.includes('/users/auth')) {
+      try {
+        const token = await this.getToken()
+        if (token) {
+          // Try to refresh token
+          const refreshResponse = await this.fetchWithRetry(`${this.baseURL}/users/refresh`, {
+            method: 'POST',
+            headers: new Headers({
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            }),
+            body: JSON.stringify({ token }),
+          }, 0)
+
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json()
+            const { useAuthStore } = await import('@/store/authStore')
+            const newToken = refreshData.token || refreshData.data?.token
+            if (newToken) {
+              useAuthStore.getState().setToken(newToken)
+
+              // Retry original request with new token
+              headers.set('Authorization', `Bearer ${newToken}`)
+              response = await this.fetchWithRetry(url, {
+                ...config,
+                headers,
+              }, retries)
+            }
+          }
+        }
+      } catch (refreshError) {
+        // Refresh failed, will be handled by error handler below
+      }
+    }
+
+    // Check if still 401 after refresh attempt
+    if (response.status === 401) {
+      throw await this.handleErrorResponse(response)
+    }
 
     const data = await response.json()
     return data

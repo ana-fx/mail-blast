@@ -18,6 +18,7 @@ import (
 type Service interface {
 	CreateCampaign(ctx context.Context, req *CreateCampaignRequest) (*models.Campaign, error)
 	GetCampaign(ctx context.Context, id uuid.UUID) (*models.Campaign, error)
+	GetAllCampaigns(ctx context.Context) ([]models.Campaign, error)
 	GetCampaignsByClient(ctx context.Context, clientID uuid.UUID) ([]models.Campaign, error)
 	UpdateCampaign(ctx context.Context, id uuid.UUID, req *UpdateCampaignRequest) (*models.Campaign, error)
 	DeleteCampaign(ctx context.Context, id uuid.UUID) error
@@ -124,6 +125,11 @@ func (s *service) CreateCampaign(ctx context.Context, req *CreateCampaignRequest
 // GetCampaign retrieves a campaign by ID
 func (s *service) GetCampaign(ctx context.Context, id uuid.UUID) (*models.Campaign, error) {
 	return s.repo.GetByID(ctx, id)
+}
+
+// GetAllCampaigns retrieves all campaigns
+func (s *service) GetAllCampaigns(ctx context.Context) ([]models.Campaign, error) {
+	return s.repo.GetAll(ctx)
 }
 
 // GetCampaignsByClient retrieves all campaigns for a client

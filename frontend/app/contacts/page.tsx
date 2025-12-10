@@ -40,7 +40,7 @@ export default function ContactsPage() {
             <p className="text-slate-600 dark:text-slate-400 mt-1">Manage your contact list</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setShowImportDialog(true)}>
+            <Button onClick={() => setShowImportDialog(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Import CSV
             </Button>

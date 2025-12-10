@@ -67,8 +67,16 @@ export const notificationsApi = {
     await api.post('/notifications/read-all')
   },
   getUnreadCount: async (): Promise<{ count: number }> => {
-    const response = await api.get<{ count: number }>('/notifications/unread-count')
-    return response.data
+    try {
+      const response = await api.get<{ count: number }>('/notifications/unread-count')
+      return response.data
+    } catch (error: any) {
+      // If endpoint doesn't exist, return 0
+      if (error?.response?.status === 404) {
+        return { count: 0 }
+      }
+      throw error
+    }
   },
 }
 

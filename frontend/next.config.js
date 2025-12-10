@@ -36,7 +36,12 @@ const nextConfig = {
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
+            value: 'no-referrer-when-downgrade'
+          },
+          // Allow external images for email preview
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; img-src 'self' data: https: http:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline';"
           }
         ]
       },

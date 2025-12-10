@@ -4,6 +4,9 @@ import (
 	"os"
 	"time"
 
+	"backend/internal/auth"
+	"backend/internal/models"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
@@ -55,12 +58,30 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 		})
 	}
 
-	// Parse client_id
-	clientID, err := uuid.Parse(req.ClientID)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid client_id format",
-		})
+	// Get client_id from request or JWT claims
+	var clientID uuid.UUID
+	var err error
+
+	// Try to get from request body first
+	if req.ClientID != "" {
+		clientID, err = uuid.Parse(req.ClientID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "invalid client_id format",
+			})
+		}
+	} else {
+		// Try to get from JWT claims
+		if claims, ok := c.Locals("claims").(*auth.Claims); ok && claims != nil && claims.ClientID != nil {
+			clientID = *claims.ClientID
+		} else if user, ok := c.Locals("user").(*models.User); ok && user != nil && user.ClientID != nil {
+			// Fallback to user from context
+			clientID = *user.ClientID
+		} else {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "client_id is required",
+			})
+		}
 	}
 
 	// Parse template_id if provided
@@ -99,6 +120,20 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(campaign)
+}
+
+// List handles GET /campaigns
+func (h *Handler) List(c *fiber.Ctx) error {
+	// For now, return empty array or get all campaigns
+	// You can add filtering/pagination later
+	campaigns, err := h.service.GetAllCampaigns(c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "failed to get campaigns",
+		})
+	}
+
+	return c.JSON(campaigns)
 }
 
 // GetByID handles GET /campaigns/:id

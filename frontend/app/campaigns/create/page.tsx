@@ -11,10 +11,12 @@ import EmailContentEditor from '@/components/campaign/EmailContentEditor'
 import AudienceScheduleForm from '@/components/campaign/AudienceScheduleForm'
 import { useCampaignStore } from '@/store/campaignStore'
 import { campaignsApi } from '@/lib/api/campaigns'
+import { useAuthStore } from '@/store/authStore'
 
 export default function CreateCampaignPage() {
   const router = useRouter()
   const { step1Data, step2Data, step3Data, currentStep, setCurrentStep, reset } = useCampaignStore()
+  const { user } = useAuthStore()
   const [campaignId, setCampaignId] = useState<string | undefined>()
 
   const createMutation = useMutation({
@@ -59,13 +61,17 @@ export default function CreateCampaignPage() {
 
   const handleStep3Finish = (sendNow: boolean) => {
     // Create campaign with all data
-    const campaignData = {
+    // client_id will be extracted from JWT token by backend if not provided
+    const campaignData: any = {
       title: step1Data.title,
       subject: step1Data.subject,
       content: step2Data.content || '',
-      from_name: step1Data.from_name,
       from_email: step1Data.from_email,
-      reply_to: step1Data.reply_to,
+    }
+
+    // Add client_id if available (backend will use JWT claims as fallback)
+    if (user?.client_id) {
+      campaignData.client_id = user.client_id
     }
 
     createMutation.mutate(campaignData, {

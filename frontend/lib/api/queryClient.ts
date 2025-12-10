@@ -11,8 +11,8 @@ export function getQueryClient(): QueryClient {
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {
-          staleTime: 10 * 1000, // 10 seconds default
-          gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
+          staleTime: 5 * 60 * 1000, // 5 minutes default (increased from 10 seconds)
+          gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
           retry: (failureCount, error: any) => {
             // Don't retry on 4xx errors except 429
             if (error?.status >= 400 && error?.status < 500 && error?.status !== 429) {

@@ -15,7 +15,10 @@ export function useUnreadCount() {
   return useQuery({
     queryKey: ['notifications-unread-count'],
     queryFn: () => notificationsApi.getUnreadCount(),
-    refetchInterval: 10000, // Poll every 10 seconds
+    refetchInterval: 60000, // Poll every 60 seconds (reduced frequency to minimize 404 errors)
+    retry: false, // Don't retry on 404
+    retryOnMount: false,
+    enabled: false, // Disable by default until backend endpoint is ready
   })
 }
 

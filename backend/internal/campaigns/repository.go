@@ -15,6 +15,7 @@ import (
 type Repository interface {
 	Create(ctx context.Context, campaign *models.Campaign) error
 	GetByID(ctx context.Context, id uuid.UUID) (*models.Campaign, error)
+	GetAll(ctx context.Context) ([]models.Campaign, error)
 	GetByClientID(ctx context.Context, clientID uuid.UUID) ([]models.Campaign, error)
 	Update(ctx context.Context, campaign *models.Campaign) error
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
@@ -51,6 +52,15 @@ func (r *repository) GetByID(ctx context.Context, id uuid.UUID) (*models.Campaig
 		return nil, fmt.Errorf("failed to get campaign: %w", err)
 	}
 	return &campaign, nil
+}
+
+// GetAll retrieves all campaigns
+func (r *repository) GetAll(ctx context.Context) ([]models.Campaign, error) {
+	var campaigns []models.Campaign
+	if err := r.db.WithContext(ctx).Order("created_at DESC").Find(&campaigns).Error; err != nil {
+		return nil, fmt.Errorf("failed to get campaigns: %w", err)
+	}
+	return campaigns, nil
 }
 
 // GetByClientID retrieves all campaigns for a client

@@ -41,6 +41,73 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* Email preview content - preserve original HTML email styling */
+  .email-preview-content {
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .email-preview-content * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .email-preview-content table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
+  }
+
+  .email-preview-content img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    border: 0 !important;
+    outline: none !important;
+  }
+
+  /* Ensure images load correctly */
+  .email-preview-content img[src] {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Fix for broken or empty images */
+  .email-preview-content img[src=""],
+  .email-preview-content img:not([src]),
+  .email-preview-content img[src="#"],
+  .email-preview-content img[data-error="true"],
+  .email-preview-content img[data-invalid-url="true"] {
+    display: none !important;
+  }
+
+  /* Ensure external images can load in production */
+  .email-preview-content img {
+    image-rendering: auto;
+    -webkit-user-drag: none;
+    user-select: none;
+    /* Allow loading from any source */
+    object-fit: contain;
+  }
+
+  /* Production: Ensure images load correctly */
+  /* Note: cross-origin is an HTML attribute, not a CSS property */
+  /* We handle CORS via HTML attributes, not CSS */
+
+  /* Preserve email HTML structure */
+  .email-preview-content html,
+  .email-preview-content body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Ensure links work */
+  .email-preview-content a {
+    color: inherit !important;
+    text-decoration: underline !important;
+  }
 }
 
 @layer base {

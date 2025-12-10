@@ -20,7 +20,8 @@ export function useAnalyticsTimeline(range: '7d' | '30d' | '90d' = '30d') {
     queryKey: ['analytics', 'timeline', range],
     queryFn: async () => {
       const response = await apiClient.analytics.timeline(range)
-      return response.data
+      // Ensure we return an array, not undefined
+      return response.data || []
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
   })

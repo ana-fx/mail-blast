@@ -12,6 +12,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'MailBlast - Email Marketing Platform',
   description: 'Professional email marketing and analytics platform',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
