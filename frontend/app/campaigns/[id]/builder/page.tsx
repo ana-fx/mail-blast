@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { Save, ArrowLeft, Eye } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Monitor, Smartphone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBuilderStore } from '@/store/builderStore'
 import { campaignsApi } from '@/lib/api/campaigns'
@@ -18,7 +18,7 @@ export default function CampaignBuilderPage() {
   const campaignId = (params?.id as string) || ''
   const [queryClient] = useState(() => new QueryClient())
 
-  const { blocks, setBlocks } = useBuilderStore()
+  const { blocks, setBlocks, isMobilePreview, toggleMobilePreview } = useBuilderStore()
 
   const { data: campaign, isLoading } = useQuery({
     queryKey: ['campaign', campaignId],
@@ -93,6 +93,25 @@ export default function CampaignBuilderPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleMobilePreview}
+                className="gap-2 hidden md:flex"
+              >
+                {isMobilePreview ? (
+                  <>
+                    <Monitor className="h-4 w-4" />
+                    Desktop
+                  </>
+                ) : (
+                  <>
+                    <Smartphone className="h-4 w-4" />
+                    Mobile
+                  </>
+                )}
+              </Button>
+              <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2 hidden md:block" />
               <Button
                 variant="outline"
                 size="sm"

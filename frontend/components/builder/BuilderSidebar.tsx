@@ -48,20 +48,21 @@ function DraggableBlock({ type, label, icon: Icon, description, onClick }: any) 
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        className="h-full"
       >
         <Card
-          className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700 cursor-grab active:cursor-grabbing h-full"
+          className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all border-slate-200 dark:border-slate-700 h-full"
           onClick={onClick}
         >
-          <CardContent className="p-4 flex flex-col items-center text-center gap-2 h-full justify-center">
+          <CardContent className="p-3 md:p-4 flex flex-col items-center text-center gap-2 h-full justify-between">
             <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0">
-              <Icon className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              <Icon className="h-4 w-4 md:h-5 md:w-5 text-slate-600 dark:text-slate-400" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+            <div className="w-full">
+              <p className="text-xs md:text-sm font-medium text-slate-900 dark:text-slate-100 line-clamp-1">
                 {label}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+              <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 h-[28px] md:h-[32px]">
                 {description}
               </p>
             </div>
@@ -110,56 +111,36 @@ export default function BuilderSidebar() {
   }
 
   return (
-    <div className="w-full lg:w-80 bg-white dark:bg-slate-900 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-700 flex flex-col h-1/3 lg:h-full z-10 shrink-0">
-      {/* Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <h2 className="font-semibold text-slate-900 dark:text-slate-100">Builder</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleMobilePreview}
-          className="gap-2"
-        >
-          {isMobilePreview ? (
-            <>
-              <Monitor className="h-4 w-4" />
-              Desktop
-            </>
-          ) : (
-            <>
-              <Smartphone className="h-4 w-4" />
-              Mobile
-            </>
-          )}
-        </Button>
-      </div>
+    <div className="w-full lg:w-80 bg-white dark:bg-slate-900 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-700 flex flex-col max-h-[400px] lg:max-h-none lg:h-full z-10 shrink-0">
+
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 mx-4 mt-4">
-          <TabsTrigger value="blocks">Blocks</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+        <TabsList className="grid w-full grid-cols-2 shrink-0 rounded-none h-12">
+          <TabsTrigger value="blocks" className="text-xs md:text-sm h-full rounded-none data-[state=active]:border-b-2 data-[state=active]:border-black dark:data-[state=active]:border-white data-[state=active]:shadow-none bg-transparent">Blocks</TabsTrigger>
+          <TabsTrigger value="settings" className="text-xs md:text-sm h-full rounded-none data-[state=active]:border-b-2 data-[state=active]:border-black dark:data-[state=active]:border-white data-[state=active]:shadow-none bg-transparent">Settings</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="blocks" className="flex-1 overflow-y-auto p-4 min-h-0">
-          <div className="grid grid-cols-3 lg:grid-cols-2 gap-3 pb-4">
+        <TabsContent value="blocks" className="flex-1 overflow-y-auto p-3 md:p-4 min-h-0 mt-3 md:mt-4">
+          <div className="grid grid-cols-2 gap-2 md:gap-3 pb-4">
             {blockTypes.map((blockType) => (
-              <DraggableBlock
-                key={blockType.type}
-                {...blockType}
-                onClick={() => handleAddBlock(blockType.type)}
-              />
+              <div key={blockType.type} className="aspect-[4/3]">
+                <DraggableBlock
+                  {...blockType}
+                  onClick={() => handleAddBlock(blockType.type)}
+                />
+              </div>
             ))}
           </div>
         </TabsContent>
 
-        <TabsContent value="settings" className="flex-1 overflow-y-auto min-h-0">
+        <TabsContent value="settings" className="flex-1 overflow-y-auto min-h-0 mt-3 md:mt-4">
           {selectedBlockId ? (
             <BlockSettings />
           ) : (
             <div className="p-4 text-center text-slate-500 dark:text-slate-400">
-              <Settings className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">Select a block to edit settings</p>
+              <Settings className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-2 opacity-50" />
+              <p className="text-xs md:text-sm">Select a block to edit settings</p>
             </div>
           )}
         </TabsContent>
@@ -167,5 +148,4 @@ export default function BuilderSidebar() {
     </div>
   )
 }
-
 

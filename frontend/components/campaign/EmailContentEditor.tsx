@@ -54,8 +54,8 @@ export default function EmailContentEditor({ campaignId, onNext, onBack }: Email
       transition={{ duration: 0.3 }}
       className="space-y-6"
     >
-      <div className="flex justify-between items-center mb-4">
-        <Tabs value={editorMode} onValueChange={(v) => setEditorMode(v as 'visual' | 'classic')} className="w-[400px]">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+        <Tabs value={editorMode} onValueChange={(v) => setEditorMode(v as 'visual' | 'classic')} className="w-full md:w-[400px]">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="visual" className="gap-2">
               <Layout className="h-4 w-4" />
@@ -67,13 +67,82 @@ export default function EmailContentEditor({ campaignId, onNext, onBack }: Email
             </TabsTrigger>
           </TabsList>
         </Tabs>
+        
+        <div className="flex gap-2 w-full md:w-auto justify-end">
+          <Button
+            variant="outline"
+            onClick={() => setShowPreview(true)}
+          >
+            Preview Email
+          </Button>
+          {campaignId && (
+            <Button
+              variant="outline"
+              onClick={() => setShowTestModal(true)}
+            >
+              Send Test Email
+            </Button>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          {editorMode === 'visual' ? (
-            <div className="space-y-4">
-              <IntegratedBuilder />
+      <div className="w-full">
+        {editorMode === 'visual' ? (
+          <div className="space-y-4">
+            <IntegratedBuilder />
+            <div className="flex justify-between pt-4">
+              <Button variant="outline" onClick={onBack}>
+                Back
+              </Button>
+              <Button onClick={onNext}>
+                Next
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle>Email Content</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {step2Data.html_mode ? (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">HTML Content</label>
+                  <textarea
+                    className="w-full h-96 rounded-md border border-slate-200 p-3 font-mono text-sm"
+                    value={step2Data.content}
+                    onChange={(e) => setStep2Data({ content: e.target.value })}
+                    placeholder="<html>...</html>"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">Email Content</label>
+                  {typeof window !== 'undefined' && (
+                    <ReactQuill
+                      theme="snow"
+                      value={step2Data.content}
+                      onChange={(value) => setStep2Data({ content: value })}
+                      modules={quillModules}
+                      className="bg-white"
+                    />
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 pt-4">
+                <input
+                  type="checkbox"
+                  id="html_mode"
+                  checked={step2Data.html_mode}
+                  onChange={(e) => setStep2Data({ html_mode: e.target.checked })}
+                  className="rounded border-slate-300"
+                />
+                <label htmlFor="html_mode" className="text-sm text-slate-600">
+                  HTML Mode
+                </label>
+              </div>
+
               <div className="flex justify-between pt-4">
                 <Button variant="outline" onClick={onBack}>
                   Back
@@ -82,103 +151,23 @@ export default function EmailContentEditor({ campaignId, onNext, onBack }: Email
                   Next
                 </Button>
               </div>
-            </div>
-          ) : (
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle>Email Content</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {step2Data.html_mode ? (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">HTML Content</label>
-                    <textarea
-                      className="w-full h-96 rounded-md border border-slate-200 p-3 font-mono text-sm"
-                      value={step2Data.content}
-                      onChange={(e) => setStep2Data({ content: e.target.value })}
-                      placeholder="<html>...</html>"
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Email Content</label>
-                    {typeof window !== 'undefined' && (
-                      <ReactQuill
-                        theme="snow"
-                        value={step2Data.content}
-                        onChange={(value) => setStep2Data({ content: value })}
-                        modules={quillModules}
-                        className="bg-white"
-                      />
-                    )}
-                  </div>
-                )}
-
-                <div className="flex items-center gap-2 pt-4">
-                  <input
-                    type="checkbox"
-                    id="html_mode"
-                    checked={step2Data.html_mode}
-                    onChange={(e) => setStep2Data({ html_mode: e.target.checked })}
-                    className="rounded border-slate-300"
-                  />
-                  <label htmlFor="html_mode" className="text-sm text-slate-600">
-                    HTML Mode
-                  </label>
-                </div>
-
-                <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={onBack}>
-                    Back
-                  </Button>
-                  <Button onClick={onNext}>
-                    Next
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => setShowPreview(true)}
-              >
-                Preview Email
-              </Button>
-              {campaignId && (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setShowTestModal(true)}
-                >
-                  Send Test Email
-                </Button>
-              )}
             </CardContent>
           </Card>
-
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">Tracking</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-slate-600 space-y-2">
-              <p>✓ Open tracking pixel will be added automatically</p>
-              <p>✓ Click tracking will be enabled for all links</p>
-              <p className="text-xs text-slate-500 mt-4">
-                These features are handled by the backend automatically.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        )}
       </div>
+
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-lg">Tracking</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-slate-600 space-y-2">
+          <p>✓ Open tracking pixel will be added automatically</p>
+          <p>✓ Click tracking will be enabled for all links</p>
+          <p className="text-xs text-slate-500 mt-4">
+            These features are handled by the backend automatically.
+          </p>
+        </CardContent>
+      </Card>
 
       {showTestModal && campaignId && (
         <SendTestModal

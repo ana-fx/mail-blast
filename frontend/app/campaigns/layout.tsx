@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import Topbar from '@/components/Topbar'
 import Protected from '@/components/Protected'
@@ -12,6 +13,18 @@ export default function CampaignsLayout({
   children: React.ReactNode
 }) {
   const [queryClient] = useState(new QueryClient())
+  const pathname = usePathname()
+  const isBuilder = pathname?.includes('/builder')
+
+  if (isBuilder) {
+    return (
+      <Protected>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </Protected>
+    )
+  }
 
   return (
     <Protected>
