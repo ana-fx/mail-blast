@@ -52,7 +52,7 @@ export default function WorkspaceForm() {
   const handleTestWebhook = () => {
     testWebhook(undefined, {
       onSuccess: (result) => {
-        setWebhookTestResult(result)
+        setWebhookTestResult(result as any)
         setTimeout(() => setWebhookTestResult(null), 5000)
       },
       onError: () => {
@@ -211,11 +211,10 @@ export default function WorkspaceForm() {
               </div>
               {webhookTestResult && (
                 <div
-                  className={`text-sm p-2 rounded ${
-                    webhookTestResult.success
+                  className={`text-sm p-2 rounded ${webhookTestResult.success
                       ? 'bg-green-50 text-green-700'
                       : 'bg-red-50 text-red-700'
-                  }`}
+                    }`}
                 >
                   {webhookTestResult.message}
                 </div>

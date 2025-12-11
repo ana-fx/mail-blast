@@ -12,10 +12,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'MailBlast - Email Marketing Platform',
   description: 'Professional email marketing and analytics platform',
-  icons: {
-    icon: '/favicon.ico',
-  },
 }
+
+import Providers from './providers'
 
 export default function RootLayout({
   children,
@@ -30,7 +29,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { MoreVertical, UserPlus, Shield, User, Ban } from 'lucide-react'
 import { useAdminUsers } from '@/hooks/useAdminUsers'
-import type { AdminUser } from '@/lib/api/admin'
+import type { User as AdminUser } from '@/lib/api/admin'
 import { Skeleton } from '@/components/ui/skeleton'
 import CreateUserDialog from './CreateUserDialog'
 import { formatDateTime } from '@/lib/utils'
@@ -120,12 +120,12 @@ export default function UserTable() {
                       <td className="py-4 px-4">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            user.active
+                            user.status === 'active'
                               ? 'bg-green-100 text-green-700'
                               : 'bg-red-100 text-red-700'
                           }`}
                         >
-                          {user.active ? 'Active' : 'Inactive'}
+                          {user.status === 'active' ? 'Active' : 'Deactivated'}
                         </span>
                       </td>
                       <td className="py-4 px-4">
@@ -151,7 +151,7 @@ export default function UserTable() {
                               }}
                             >
                               <Ban className="h-4 w-4 mr-2" />
-                              {user.active ? 'Deactivate' : 'Activate'}
+                              {user.status === 'active' ? 'Deactivate' : 'Activate'}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-600"

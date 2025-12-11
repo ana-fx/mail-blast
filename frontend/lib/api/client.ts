@@ -22,7 +22,7 @@ export const authApi = {
     return httpClient.post<AuthResponse>('/auth/login', credentials, { skipAuth: true })
   },
   logout: async (): Promise<void> => {
-    return httpClient.post('/auth/logout')
+    await httpClient.post('/auth/logout')
   },
   refresh: async (): Promise<ApiResponse<AuthResponse>> => {
     return httpClient.post<AuthResponse>('/auth/refresh')
@@ -49,7 +49,7 @@ export const campaignsApi = {
     return httpClient.put<Campaign>(`/campaigns/${id}`, data)
   },
   delete: async (id: string): Promise<void> => {
-    return httpClient.delete(`/campaigns/${id}`)
+    await httpClient.delete(`/campaigns/${id}`)
   },
   send: async (id: string, data?: { send_at?: string }): Promise<ApiResponse<void>> => {
     return httpClient.post(`/campaigns/${id}/send`, data)
@@ -74,7 +74,7 @@ export const contactsApi = {
     return httpClient.put<Contact>(`/contacts/${id}`, data)
   },
   delete: async (id: string): Promise<void> => {
-    return httpClient.delete(`/contacts/${id}`)
+    await httpClient.delete(`/contacts/${id}`)
   },
   import: async (file: File, mapping: Record<string, string>): Promise<ApiResponse<{ imported: number; failed: number }>> => {
     const formData = new FormData()
@@ -101,7 +101,7 @@ export const templatesApi = {
     return httpClient.put<Template>(`/templates/${id}`, data)
   },
   delete: async (id: string): Promise<void> => {
-    return httpClient.delete(`/templates/${id}`)
+    await httpClient.delete(`/templates/${id}`)
   },
 }
 

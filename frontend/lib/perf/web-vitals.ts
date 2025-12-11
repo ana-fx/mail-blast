@@ -1,6 +1,6 @@
 'use client'
 
-import { onCLS, onFID, onINP, onLCP, onTTFB, Metric } from 'web-vitals'
+import { onCLS, onINP, onLCP, onTTFB, Metric } from 'web-vitals'
 
 export interface WebVitalsReport {
   name: string
@@ -46,7 +46,7 @@ export function reportWebVitals() {
   vitalsReported = true
 
   onCLS(sendToAnalytics)
-  onFID(sendToAnalytics)
+
   onINP(sendToAnalytics)
   onLCP(sendToAnalytics)
   onTTFB(sendToAnalytics)

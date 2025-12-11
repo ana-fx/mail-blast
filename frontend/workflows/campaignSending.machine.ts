@@ -26,7 +26,7 @@ export const campaignSendingMachine = setup({
     hasSettings: ({ context }) => {
       return !!(context.settings?.fromName && context.settings?.fromEmail)
     },
-    canProceed: ({ context, guard }) => {
+    canProceed: ({ context }) => {
       // Dynamic guard based on current state
       return true
     },

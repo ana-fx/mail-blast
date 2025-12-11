@@ -25,7 +25,7 @@ export default function QueueMonitor() {
 
   const handleRetryAll = () => {
     if (confirm('Retry all failed jobs?')) {
-      retry()
+      retry(undefined)
     }
   }
 

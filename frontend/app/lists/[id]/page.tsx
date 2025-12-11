@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Avatar } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Plus, Trash2 } from 'lucide-react'
 import { listsApi } from '@/lib/api/lists'
 import { contactsApi } from '@/lib/api/contacts'
@@ -111,9 +111,11 @@ export default function ListDetailPage() {
                         <tr key={contact.id} className="border-b border-slate-100 hover:bg-slate-50">
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-3">
-                              <Avatar
-                                name={`${contact.first_name || ''} ${contact.last_name || ''}`.trim() || contact.email}
-                              />
+                              <Avatar>
+                                <AvatarFallback>
+                                  {(`${contact.first_name || ''} ${contact.last_name || ''}`.trim() || contact.email || '?').substring(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
                               <div>
                                 <div className="font-medium text-slate-900">
                                   {contact.first_name || contact.last_name

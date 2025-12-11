@@ -17,9 +17,8 @@ export const trackingApi = {
   trackClick: async (messageId: string, url: string): Promise<string> => {
     // URL should be base64 encoded by backend
     const response = await httpClient.get<{ redirect_url: string }>(
-      `/track/click/${messageId}`,
+      `/track/click/${messageId}?url=${encodeURIComponent(url)}`,
       {
-        params: { url },
         skipAuth: true,
         timeout: 5000,
       }

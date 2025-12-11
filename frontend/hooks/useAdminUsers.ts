@@ -34,7 +34,7 @@ export function useAdminUsers() {
   })
 
   return {
-    users: data || [],
+    users: data?.users || [],
     isLoading,
     error,
     createUser: createMutation.mutate,

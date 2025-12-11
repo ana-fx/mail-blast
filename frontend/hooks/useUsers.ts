@@ -22,24 +22,14 @@ export function useUserActions() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateUserRequest, options?: { onSuccess?: (data: any) => void }) => {
-      return adminApi.createUser(data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (data: CreateUserRequest) => adminApi.createUser(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] })
     },
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateUserRequest }, options?: { onSuccess?: (data: any) => void }) => {
-      return adminApi.updateUser(id, data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: ({ id, data }: { id: string; data: UpdateUserRequest }) => adminApi.updateUser(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] })
       queryClient.invalidateQueries({ queryKey: ['admin-user', variables.id] })
@@ -47,11 +37,7 @@ export function useUserActions() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string, options?: { onSuccess?: () => void }) => {
-      return adminApi.deleteUser(id).then(() => {
-        options?.onSuccess?.()
-      })
-    },
+    mutationFn: (id: string) => adminApi.deleteUser(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] })
     },

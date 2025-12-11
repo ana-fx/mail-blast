@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Trash2, Key, Copy, Check, Plus, Loader2 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useApiKeys } from '@/hooks/useApiKeys'
+import { useApiKeys, useApiKeyActions } from '@/hooks/useApiKeys'
 import { formatDateTime } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -27,7 +27,8 @@ const createApiKeySchema = z.object({
 type CreateApiKeyFormData = z.infer<typeof createApiKeySchema>
 
 export default function ApiKeyList() {
-  const { apiKeys, isLoading, createApiKey, deleteApiKey, isCreating, isDeleting } = useApiKeys()
+  const { data: apiKeys = [], isLoading } = useApiKeys()
+  const { create: createApiKey, delete: deleteApiKey, isCreating, isDeleting } = useApiKeyActions()
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [newKey, setNewKey] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -42,7 +43,7 @@ export default function ApiKeyList() {
   })
 
   const onSubmit = (data: CreateApiKeyFormData) => {
-    createApiKey(data, {
+    createApiKey({ ...data, scopes: ['*'] }, {
       onSuccess: (response) => {
         setNewKey(response.key)
         reset()
@@ -122,7 +123,7 @@ export default function ApiKeyList() {
                       </p>
                       <p className="text-xs text-slate-400 mt-1">
                         Created {formatDateTime(key.created_at)}
-                        {key.last_used && ` • Last used ${formatDateTime(key.last_used)}`}
+                        {key.last_used_at && ` • Last used ${formatDateTime(key.last_used_at)}`}
                       </p>
                     </div>
                     <Button

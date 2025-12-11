@@ -11,7 +11,7 @@ import { Loader2 } from 'lucide-react'
 import { useProfile } from '@/hooks/useProfile'
 
 const passwordSchema = z.object({
-  old_password: z.string().min(1, 'Current password is required'),
+  current_password: z.string().min(1, 'Current password is required'),
   new_password: z.string().min(8, 'Password must be at least 8 characters'),
   confirm_password: z.string().min(8, 'Please confirm your password'),
 }).refine((data) => data.new_password === data.confirm_password, {
@@ -36,7 +36,7 @@ export default function PasswordForm() {
   const onSubmit = (data: PasswordFormData) => {
     changePassword(
       {
-        old_password: data.old_password,
+        current_password: data.current_password,
         new_password: data.new_password,
       },
       {
@@ -67,17 +67,17 @@ export default function PasswordForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Current Password */}
             <div className="space-y-2">
-              <label htmlFor="old_password" className="text-sm font-medium text-slate-700">
+              <label htmlFor="current_password" className="text-sm font-medium text-slate-700">
                 Current Password
               </label>
               <Input
-                id="old_password"
+                id="current_password"
                 type="password"
-                {...register('old_password')}
-                className={errors.old_password ? 'border-red-500' : ''}
+                {...register('current_password')}
+                className={errors.current_password ? 'border-red-500' : ''}
               />
-              {errors.old_password && (
-                <p className="text-xs text-red-500">{errors.old_password.message}</p>
+              {errors.current_password && (
+                <p className="text-xs text-red-500">{errors.current_password.message}</p>
               )}
             </div>
 

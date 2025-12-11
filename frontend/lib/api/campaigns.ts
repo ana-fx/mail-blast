@@ -45,8 +45,8 @@ export const campaignsApi = {
     const response = await api.post<Campaign>(`/campaigns/${id}/schedule`, data)
     return response.data
   },
-  sendTest: async (id: string, email: string): Promise<void> => {
-    await api.post(`/campaigns/${id}/test`, { email })
+  sendTest: async (id: string, data: { email: string }): Promise<void> => {
+    await api.post(`/campaigns/${id}/test`, data)
   },
   getTemplate: async (id: string): Promise<CampaignTemplate> => {
     const response = await api.get<CampaignTemplate>(`/campaigns/${id}/template`)

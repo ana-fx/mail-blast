@@ -7,12 +7,7 @@ export function useTemplateActions() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateTemplateRequest, options?: { onSuccess?: (data: any) => void }) => {
-      return templatesApi.create(data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (data: CreateTemplateRequest) => templatesApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] })
     },

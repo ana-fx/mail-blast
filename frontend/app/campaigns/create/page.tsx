@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { AnimatePresence } from 'framer-motion'
@@ -18,6 +18,12 @@ export default function CreateCampaignPage() {
   const { step1Data, step2Data, step3Data, currentStep, setCurrentStep, reset } = useCampaignStore()
   const { user } = useAuthStore()
   const [campaignId, setCampaignId] = useState<string | undefined>()
+
+  useEffect(() => {
+    return () => {
+      reset()
+    }
+  }, [reset])
 
   const createMutation = useMutation({
     mutationFn: (data: any) => campaignsApi.create(data),
@@ -109,21 +115,19 @@ export default function CreateCampaignPage() {
         {[1, 2, 3].map((step) => (
           <div key={step} className="flex items-center">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step === currentStep
-                  ? 'bg-slate-900 text-white'
-                  : step < currentStep
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step === currentStep
+                ? 'bg-slate-900 text-white'
+                : step < currentStep
                   ? 'bg-green-500 text-white'
                   : 'bg-slate-200 text-slate-600'
-              }`}
+                }`}
             >
               {step < currentStep ? '✓' : step}
             </div>
             {step < 3 && (
               <div
-                className={`w-16 h-1 ${
-                  step < currentStep ? 'bg-green-500' : 'bg-slate-200'
-                }`}
+                className={`w-16 h-1 ${step < currentStep ? 'bg-green-500' : 'bg-slate-200'
+                  }`}
               />
             )}
           </div>

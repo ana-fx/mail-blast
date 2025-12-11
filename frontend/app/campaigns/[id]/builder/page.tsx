@@ -4,45 +4,21 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
 import { Save, ArrowLeft, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBuilderStore } from '@/store/builderStore'
 import { campaignsApi } from '@/lib/api/campaigns'
 import BuilderSidebar from '@/components/builder/BuilderSidebar'
-import BlockRenderer from '@/components/builder/BlockRenderer'
+import Canvas from '@/components/builder/Canvas'
 import { exportToHTML } from '@/lib/builder/htmlExport'
-import { cn } from '@/lib/utils'
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
 
 export default function CampaignBuilderPage() {
   const params = useParams()
   const router = useRouter()
   const campaignId = (params?.id as string) || ''
   const [queryClient] = useState(() => new QueryClient())
-  
-  const { blocks, setBlocks, isMobilePreview, reorderBlocks } = useBuilderStore()
-  
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
+
+  const { blocks, setBlocks } = useBuilderStore()
 
   const { data: campaign, isLoading } = useQuery({
     queryKey: ['campaign', campaignId],
@@ -63,7 +39,7 @@ export default function CampaignBuilderPage() {
         blocks: blocks,
       }
       await campaignsApi.saveTemplate(campaignId, template)
-      
+
       // Also save HTML version
       const html = exportToHTML(blocks)
       await campaignsApi.update(campaignId, { content: html })
@@ -75,13 +51,6 @@ export default function CampaignBuilderPage() {
       setBlocks(template.blocks)
     }
   }, [template, setBlocks])
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (over && active.id !== over.id) {
-      reorderBlocks(active.id as string, over.id as string)
-    }
-  }
 
   const handleSave = () => {
     saveMutation.mutate()
@@ -104,7 +73,7 @@ export default function CampaignBuilderPage() {
         {/* Main Canvas */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-20 relative">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
@@ -148,42 +117,9 @@ export default function CampaignBuilderPage() {
           </div>
 
           {/* Canvas */}
-          <div className="flex-1 overflow-y-auto p-8">
-            <div
-              className={cn(
-                'mx-auto bg-white rounded-2xl shadow-lg transition-all',
-                isMobilePreview ? 'w-[375px]' : 'max-w-2xl w-full'
-              )}
-            >
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={blocks.map((b) => b.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="p-8 space-y-4">
-                    {blocks.map((block) => (
-                      <motion.div
-                        key={block.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <BlockRenderer block={block} />
-                      </motion.div>
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </div>
-          </div>
+          <Canvas />
         </div>
       </div>
     </QueryClientProvider>
   )
 }
-
-

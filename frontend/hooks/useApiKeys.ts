@@ -14,24 +14,14 @@ export function useApiKeyActions() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateApiKeyRequest, options?: { onSuccess?: (data: CreateApiKeyResponse) => void }) => {
-      return settingsApi.createApiKey(data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (data: CreateApiKeyRequest) => settingsApi.createApiKey(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['api-keys'] })
     },
   })
 
   const regenerateMutation = useMutation({
-    mutationFn: (id: string, options?: { onSuccess?: (data: CreateApiKeyResponse) => void }) => {
-      return settingsApi.regenerateApiKey(id).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (id: string) => settingsApi.regenerateApiKey(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['api-keys'] })
     },

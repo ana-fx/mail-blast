@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  Type, 
-  FileText, 
-  MousePointerClick, 
-  Image, 
-  Minus, 
-  Layout, 
+import { useDraggable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
+import {
+  Type,
+  FileText,
+  MousePointerClick,
+  Image,
+  Minus,
+  Layout,
   Settings,
   Smartphone,
   Monitor
@@ -28,6 +30,48 @@ const blockTypes = [
   { type: 'spacer', label: 'Spacer', icon: Minus, description: 'Vertical spacing' },
 ]
 
+function DraggableBlock({ type, label, icon: Icon, description, onClick }: any) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: `sidebar-${type}`,
+    data: {
+      type,
+      isSidebar: true,
+    },
+  })
+
+  const style = transform ? {
+    transform: CSS.Translate.toString(transform),
+  } : undefined
+
+  return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <Card
+          className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700 cursor-grab active:cursor-grabbing h-full"
+          onClick={onClick}
+        >
+          <CardContent className="p-4 flex flex-col items-center text-center gap-2 h-full justify-center">
+            <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0">
+              <Icon className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                {label}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                {description}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  )
+}
+
 export default function BuilderSidebar() {
   const { addBlock, selectedBlockId, isMobilePreview, toggleMobilePreview } = useBuilderStore()
   const [activeTab, setActiveTab] = useState('blocks')
@@ -38,11 +82,11 @@ export default function BuilderSidebar() {
       type,
       props: getDefaultProps(type),
     }
-    
+
     if (type === 'section') {
       newBlock.children = []
     }
-    
+
     addBlock(newBlock)
   }
 
@@ -66,7 +110,7 @@ export default function BuilderSidebar() {
   }
 
   return (
-    <div className="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col h-full">
+    <div className="w-full lg:w-80 bg-white dark:bg-slate-900 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-700 flex flex-col h-1/3 lg:h-full z-10 shrink-0">
       {/* Header */}
       <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
         <h2 className="font-semibold text-slate-900 dark:text-slate-100">Builder</h2>
@@ -97,41 +141,19 @@ export default function BuilderSidebar() {
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="blocks" className="flex-1 overflow-y-auto p-4">
-          <div className="grid grid-cols-2 gap-3">
-            {blockTypes.map((blockType) => {
-              const Icon = blockType.icon
-              return (
-                <motion.div
-                  key={blockType.type}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Card
-                    className="cursor-pointer hover:shadow-md transition-shadow border-slate-200 dark:border-slate-700"
-                    onClick={() => handleAddBlock(blockType.type)}
-                  >
-                    <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                      <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                        <Icon className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                          {blockType.label}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                          {blockType.description}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )
-            })}
+        <TabsContent value="blocks" className="flex-1 overflow-y-auto p-4 min-h-0">
+          <div className="grid grid-cols-3 lg:grid-cols-2 gap-3 pb-4">
+            {blockTypes.map((blockType) => (
+              <DraggableBlock
+                key={blockType.type}
+                {...blockType}
+                onClick={() => handleAddBlock(blockType.type)}
+              />
+            ))}
           </div>
         </TabsContent>
 
-        <TabsContent value="settings" className="flex-1 overflow-y-auto">
+        <TabsContent value="settings" className="flex-1 overflow-y-auto min-h-0">
           {selectedBlockId ? (
             <BlockSettings />
           ) : (
@@ -145,4 +167,5 @@ export default function BuilderSidebar() {
     </div>
   )
 }
+
 

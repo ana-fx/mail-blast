@@ -30,24 +30,14 @@ export function useRoleActions() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateRoleRequest, options?: { onSuccess?: (data: any) => void }) => {
-      return adminApi.createRole(data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (data: CreateRoleRequest) => adminApi.createRole(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-roles'] })
     },
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateRoleRequest }, options?: { onSuccess?: (data: any) => void }) => {
-      return adminApi.updateRole(id, data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: ({ id, data }: { id: string; data: UpdateRoleRequest }) => adminApi.updateRole(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['admin-roles'] })
       queryClient.invalidateQueries({ queryKey: ['admin-role', variables.id] })
@@ -55,22 +45,14 @@ export function useRoleActions() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string, options?: { onSuccess?: () => void }) => {
-      return adminApi.deleteRole(id).then(() => {
-        options?.onSuccess?.()
-      })
-    },
+    mutationFn: (id: string) => adminApi.deleteRole(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-roles'] })
     },
   })
 
   const updatePermissionsMutation = useMutation({
-    mutationFn: ({ id, permissions }: { id: string; permissions: any }, options?: { onSuccess?: () => void }) => {
-      return adminApi.updateRolePermissions(id, permissions).then(() => {
-        options?.onSuccess?.()
-      })
-    },
+    mutationFn: ({ id, permissions }: { id: string; permissions: any }) => adminApi.updateRolePermissions(id, permissions),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['admin-role-permissions', variables.id] })
       queryClient.invalidateQueries({ queryKey: ['admin-role', variables.id] })

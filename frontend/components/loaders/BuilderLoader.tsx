@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const BuilderLoader = dynamic(
-  () => import('@/components/builder/BuilderCanvas'),
+  () => import('@/components/builder/Canvas'),
   {
     ssr: false,
     loading: () => (

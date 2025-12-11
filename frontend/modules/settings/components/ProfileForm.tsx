@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Camera, Loader2 } from 'lucide-react'
 import { useProfile } from '@/hooks/useProfile'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Name is required'),

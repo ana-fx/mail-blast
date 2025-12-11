@@ -127,4 +127,9 @@ export const adminApi = {
   updateRolePermissions: async (id: string, permissions: Role['permissions']): Promise<void> => {
     await api.put(`/admin/roles/${id}/permissions`, { permissions })
   },
+  // Logs
+  getLogs: async (page: number = 1, level?: string): Promise<any> => {
+    const response = await api.get('/admin/logs', { params: { page, level } })
+    return response.data
+  },
 }

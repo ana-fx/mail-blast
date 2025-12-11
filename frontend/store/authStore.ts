@@ -52,11 +52,13 @@ export const useAuthStore = create<AuthState & { _hasHydrated: boolean }>()(
             return
           }
           // Set isAuthenticated based on token after rehydration
-          if (state?.token) {
-            state.isAuthenticated = true
+          if (state) {
+            if (state.token) {
+              state.isAuthenticated = true
+            }
+            // Mark as hydrated
+            state._hasHydrated = true
           }
-          // Mark as hydrated
-          state._hasHydrated = true
         }
       },
     }

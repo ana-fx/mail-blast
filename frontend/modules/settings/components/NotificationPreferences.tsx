@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { usePreferences } from '@/hooks/useProfile'
+import { UserPreferences } from '@/lib/api/settings'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -13,7 +14,7 @@ export default function NotificationPreferences() {
   const { preferences, updatePreferences, isUpdating } = usePreferences()
   const [localPreferences, setLocalPreferences] = useState(preferences)
 
-  const handleToggle = (key: keyof typeof preferences, value: boolean) => {
+  const handleToggle = (key: keyof UserPreferences, value: boolean) => {
     const updated = { ...localPreferences, [key]: value }
     setLocalPreferences(updated as any)
     updatePreferences({ [key]: value }, {

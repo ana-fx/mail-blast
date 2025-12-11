@@ -24,10 +24,25 @@ export default function LoginPage() {
 
     try {
       const response = await authApi.login({ email, password })
-      setAuth(response.token, response.user)
-      router.push('/dashboard')
+      if (response && response.token && response.user) {
+        setAuth(response.token, response.user)
+        router.push('/dashboard')
+      } else {
+        setError('Invalid response from server. Please try again.')
+      }
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.')
+      console.error('Login error:', err)
+      // Handle different error types
+      if (err.response) {
+        // Server responded with error
+        setError(err.response?.data?.error || err.response?.data?.message || 'Login failed. Please check your credentials.')
+      } else if (err.request) {
+        // Request was made but no response received
+        setError('Cannot connect to server. Please make sure the backend is running.')
+      } else {
+        // Something else happened
+        setError(err.message || 'Login failed. Please try again.')
+      }
     } finally {
       setLoading(false)
     }

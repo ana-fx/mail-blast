@@ -18,7 +18,7 @@ export default function NotificationsPage() {
   })
   const { markAllAsRead, isMarkingAllAsRead } = useNotificationActions()
 
-  const notifications = data?.notifications || []
+  const filteredNotifications = data?.notifications || []
   const unreadCount = data?.unread_count || 0
 
   return (

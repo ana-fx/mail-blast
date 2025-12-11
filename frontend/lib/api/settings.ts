@@ -104,4 +104,71 @@ export const settingsApi = {
   deleteApiKey: async (id: string): Promise<void> => {
     await api.delete(`/settings/api-keys/${id}`)
   },
+  // Profile
+  getProfile: async (): Promise<any> => {
+    const response = await api.get('/settings/profile')
+    return response.data
+  },
+  updateProfile: async (data: UpdateProfileRequest): Promise<void> => {
+    await api.put('/settings/profile', data)
+  },
+  changePassword: async (data: ChangePasswordRequest): Promise<void> => {
+    await api.post('/settings/password', data)
+  },
+  getPreferences: async (): Promise<UserPreferences> => {
+    const response = await api.get<UserPreferences>('/settings/preferences')
+    return response.data
+  },
+  updatePreferences: async (data: Partial<UserPreferences>): Promise<UserPreferences> => {
+    const response = await api.put<UserPreferences>('/settings/preferences', data)
+    return response.data
+  },
+  // Workspace
+  getWorkspace: async (): Promise<Workspace> => {
+    const response = await api.get<Workspace>('/settings/workspace')
+    return response.data
+  },
+  updateWorkspace: async (data: UpdateWorkspaceRequest): Promise<Workspace> => {
+    const response = await api.put<Workspace>('/settings/workspace', data)
+    return response.data
+  },
+  testWebhook: async (): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post<{ success: boolean; message: string }>('/settings/workspace/webhook/test')
+    return response.data
+  },
+}
+
+export interface UpdateProfileRequest {
+  name: string
+  email: string
+}
+
+export interface ChangePasswordRequest {
+  current_password?: string
+  new_password?: string
+}
+
+export interface UserPreferences {
+  theme?: string
+  notifications?: boolean
+  weekly_digest?: boolean
+  campaign_report_summary?: boolean
+  alerts_bounces?: boolean
+  alerts_failures?: boolean
+}
+
+export interface Workspace {
+  id: string
+  name: string
+  default_from_name: string
+  default_from_email: string
+  pixel_tracking_enabled: boolean
+  click_tracking_enabled: boolean
+  webhook_endpoint?: string
+}
+
+export interface UpdateWorkspaceRequest {
+  name?: string
+  default_from_name?: string
+  default_from_email?: string
 }

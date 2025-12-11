@@ -29,7 +29,7 @@ export class WorkflowEngine<TContext extends WorkflowContext = WorkflowContext> 
     // Persist state changes
     this.actor.subscribe((state) => {
       if (this.config.persistKey) {
-        this.persistState(state.context)
+        this.persistState((state as any).context)
       }
     })
   }
@@ -107,7 +107,7 @@ export class WorkflowEngine<TContext extends WorkflowContext = WorkflowContext> 
   getState(): WorkflowState | null {
     if (!this.actor) return null
 
-    const snapshot = this.actor.getSnapshot()
+    const snapshot = this.actor.getSnapshot() as any
     const value = typeof snapshot.value === 'string' ? snapshot.value : Object.keys(snapshot.value)[0]
 
     return {
@@ -123,14 +123,14 @@ export class WorkflowEngine<TContext extends WorkflowContext = WorkflowContext> 
 
   canNext(): boolean {
     if (!this.actor) return false
-    const snapshot = this.actor.getSnapshot()
+    const snapshot = this.actor.getSnapshot() as any
     // Check if there's a valid next transition
     return snapshot.can({ type: 'NEXT' }) || false
   }
 
   canBack(): boolean {
     if (!this.actor) return false
-    const snapshot = this.actor.getSnapshot()
+    const snapshot = this.actor.getSnapshot() as any
     // Check if there's a valid back transition
     return snapshot.can({ type: 'BACK' }) || false
   }
@@ -147,7 +147,8 @@ export class WorkflowEngine<TContext extends WorkflowContext = WorkflowContext> 
   subscribe(callback: (state: WorkflowState) => void) {
     if (!this.actor) return () => {}
 
-    return this.actor.subscribe((snapshot) => {
+    return this.actor.subscribe((state) => {
+      const snapshot = state as any
       const value = typeof snapshot.value === 'string' ? snapshot.value : Object.keys(snapshot.value)[0]
       callback({
         value,

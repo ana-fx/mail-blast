@@ -8,6 +8,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 seconds timeout
 })
 
 // Request interceptor - attach JWT token
@@ -24,17 +25,37 @@ api.interceptors.request.use(
         config.headers['X-Internal-Key'] = internalKey
       }
     }
+    // Log request in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`)
+    }
     return config
   },
   (error) => {
+    console.error('[API Request Error]', error)
     return Promise.reject(error)
   }
 )
 
 // Response interceptor - handle 401 with token refresh attempt
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Log response in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[API Response] ${response.status} ${response.config.url}`)
+    }
+    return response
+  },
   async (error) => {
+    // Log error in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[API Error]', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.status,
+        url: error.config?.url,
+      })
+    }
     const originalRequest = error.config
 
     // Handle 401 - try to refresh token first (skip refresh endpoint itself)

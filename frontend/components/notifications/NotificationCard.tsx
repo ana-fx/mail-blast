@@ -18,8 +18,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Notification } from '@/lib/api/notifications'
 import { useNotificationActions } from '@/hooks/useNotifications'
-import { formatDistanceToNow } from 'date-fns'
-import { cn } from '@/lib/utils'
+import { cn, formatRelativeTime } from '@/lib/utils'
 
 interface NotificationCardProps {
   notification: Notification

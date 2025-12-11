@@ -2,6 +2,8 @@
 
 import { create } from 'zustand'
 
+import { BuilderBlock } from './builderStore'
+
 interface Step1Data {
   title: string
   subject: string
@@ -13,6 +15,7 @@ interface Step1Data {
 interface Step2Data {
   content: string
   html_mode: boolean
+  blocks?: BuilderBlock[]
 }
 
 interface Step3Data {
@@ -45,6 +48,7 @@ const initialStep1: Step1Data = {
 const initialStep2: Step2Data = {
   content: '',
   html_mode: false,
+  blocks: [],
 }
 
 const initialStep3: Step3Data = {

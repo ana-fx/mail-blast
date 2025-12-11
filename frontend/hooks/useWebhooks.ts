@@ -22,24 +22,14 @@ export function useWebhookActions() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateWebhookRequest, options?: { onSuccess?: (data: any) => void }) => {
-      return webhooksApi.create(data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (data: CreateWebhookRequest) => webhooksApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['webhooks'] })
     },
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateWebhookRequest }, options?: { onSuccess?: (data: any) => void }) => {
-      return webhooksApi.update(id, data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: ({ id, data }: { id: string; data: UpdateWebhookRequest }) => webhooksApi.update(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['webhooks'] })
       queryClient.invalidateQueries({ queryKey: ['webhook', variables.id] })
@@ -47,11 +37,7 @@ export function useWebhookActions() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string, options?: { onSuccess?: () => void }) => {
-      return webhooksApi.delete(id).then(() => {
-        options?.onSuccess?.()
-      })
-    },
+    mutationFn: (id: string) => webhooksApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['webhooks'] })
     },

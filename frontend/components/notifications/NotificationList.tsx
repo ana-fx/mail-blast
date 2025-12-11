@@ -18,7 +18,7 @@ export default function NotificationList({ onClose }: NotificationListProps) {
   })
   const { markAllAsRead, isMarkingAllAsRead } = useNotificationActions()
 
-  const notifications = data?.notifications || []
+  const filteredNotifications = data?.notifications || []
 
   return (
     <div className="flex flex-col h-full">

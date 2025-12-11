@@ -1,25 +1,25 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { adminApi, type CreateApiKeyRequest } from '@/lib/api/admin'
+import { settingsApi, type CreateApiKeyRequest } from '@/lib/api/settings'
 
 export function useApiKeys() {
   const queryClient = useQueryClient()
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin', 'api-keys'],
-    queryFn: () => adminApi.getApiKeys(),
+    queryFn: () => settingsApi.getApiKeys(),
   })
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateApiKeyRequest) => adminApi.createApiKey(data),
+    mutationFn: (data: CreateApiKeyRequest) => settingsApi.createApiKey(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'api-keys'] })
     },
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => adminApi.deleteApiKey(id),
+    mutationFn: (id: string) => settingsApi.deleteApiKey(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'api-keys'] })
     },

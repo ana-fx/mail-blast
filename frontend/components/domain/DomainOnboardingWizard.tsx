@@ -23,10 +23,21 @@ export default function DomainOnboardingWizard({ onComplete }: DomainOnboardingW
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'verifying' | 'verified' | 'failed'>('pending')
   const { add: addDomain, verify, recheck, isAdding, isVerifying, isRechecking } = useDomainActions()
 
+  const [domainId, setDomainId] = useState<string | null>(null)
+
+  const handleAddDomain = () => {
+    addDomain(domain, {
+      onSuccess: (data) => {
+        setDomainId(data.id)
+        setDnsRecords(data.dns_records)
+        setStep(2)
+      },
+    })
+  }
 
   const handleVerify = () => {
-    // This would use the domain ID from the created domain
-    verify('', {
+    if (!domainId) return
+    verify(domainId, {
       onSuccess: () => {
         setVerificationStatus('verifying')
         // Poll for verification status

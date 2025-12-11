@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"backend/internal/auth"
+	"backend/internal/models"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -231,4 +232,20 @@ func (h *Handler) RefreshToken(c *fiber.Ctx) error {
 		"expires_in": 86400, // 24 hours in seconds
 		"message":    "Token refreshed successfully",
 	})
+}
+
+// GetMe handles GET /users/me - returns current authenticated user
+func (h *Handler) GetMe(c *fiber.Ctx) error {
+	// Get user from context (set by AuthMiddleware)
+	user, ok := c.Locals("user").(*models.User)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "User not found in context",
+		})
+	}
+
+	// Don't return password
+	user.Password = ""
+
+	return c.JSON(user)
 }

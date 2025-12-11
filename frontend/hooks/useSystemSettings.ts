@@ -12,12 +12,7 @@ export function useSystemSettings() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: (data: Partial<SystemSettings>, options?: { onSuccess?: (data: any) => void }) => {
-      return settingsApi.updateSystemSettings(data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (data: Partial<SystemSettings>) => settingsApi.updateSystemSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['system-settings'] })
     },
@@ -47,12 +42,7 @@ export function useTrackingSettings() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: (data: TrackingSettings, options?: { onSuccess?: (data: any) => void }) => {
-      return settingsApi.updateTrackingSettings(data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (data: TrackingSettings) => settingsApi.updateTrackingSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tracking-settings'] })
     },

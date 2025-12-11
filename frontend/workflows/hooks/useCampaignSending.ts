@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { WorkflowEngine } from '../workflow-engine'
 import { campaignSendingMachine } from '../campaignSending.machine'
 import { useWorkflow } from './useWorkflow'

@@ -12,12 +12,7 @@ export function useTeamSettings() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: (data: Partial<TeamSettings>, options?: { onSuccess?: (data: any) => void }) => {
-      return settingsApi.updateTeamSettings(data).then((result) => {
-        options?.onSuccess?.(result)
-        return result
-      })
-    },
+    mutationFn: (data: Partial<TeamSettings>) => settingsApi.updateTeamSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['team-settings'] })
     },
